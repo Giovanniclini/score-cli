@@ -23,3 +23,34 @@ impl AddPlayer {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_args() {
+        let add_player = AddPlayer::parse(&vec![String::from("user-name")]);
+        
+        assert!(add_player.is_ok());
+
+        let add_player = add_player.unwrap();
+        let player_name = add_player.player.get_name();
+
+        assert_eq!("user-name", player_name);
+    }
+
+    #[test]
+    fn parse_args_zero_arguments() {
+        let add_player = AddPlayer::parse(&vec![]);
+
+        assert!(add_player.is_err())
+    }
+
+    #[test]
+    fn parse_args_too_many_arguments() {
+        let add_player = AddPlayer::parse(&vec![String::from("user-name1"), String::from("user-name2")]);
+
+        assert!(add_player.is_err())
+    }
+}
