@@ -6,7 +6,13 @@ fn main() {
 
     let args: Vec<String> = env::args().skip(1).collect();
 
-    let command = Command::parse(&args);
+    let command =  match Command::parse(&args) {
+        Ok(command) => command,
+        Err(err) => {
+            println!("Probblem parsing command: {err}");
+            process::exit(1);
+        }
+    };
 
     if let Err(err) = command.run() {
         println!("Problem executing command: {err}");
