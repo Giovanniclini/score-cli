@@ -9,13 +9,13 @@ fn main() {
     let command =  match Command::parse(&args) {
         Ok(command) => command,
         Err(err) => {
-            println!("Probblem parsing command: {err}");
+            eprintln!("Probblem parsing command: {err}");
             process::exit(1);
         }
     };
 
     if let Err(err) = command.run() {
-        println!("Problem executing command: {err}");
+        eprintln!("Problem executing command: {err}");
         process::exit(1);
     }
 

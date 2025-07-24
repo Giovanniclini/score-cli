@@ -32,12 +32,8 @@ impl Command {
         self.args.to_vec()
     }
 
-    fn get_optional_args(&self) -> Option<HashMap<String, String>> {
-        if self.optional_args.len() == 0 {
-            None
-        } else {
-            Some(self.optional_args.to_owned())
-        }
+    fn get_optional_args(&self) -> HashMap<String, String> {
+        self.optional_args.to_owned()
     }
 
     pub fn run(&self) -> Result<(), &'static str> {
