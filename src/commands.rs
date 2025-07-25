@@ -1,13 +1,15 @@
-use crate::commands::add_player::AddPlayer;
+use crate::commands::{add_player::AddPlayer, delete_player::DeletePlayer};
 use std::collections::HashMap;
 
 mod models;
 mod utils;
 mod add_player;
+mod delete_player;
 
 #[derive(Debug)]
 enum CommandType {
     AddPlayer,
+    DeletePlayer,
     Invalid
 }
 
@@ -43,6 +45,10 @@ impl Command {
                 let command = AddPlayer::parse(&self.get_args(), &self.get_optional_args())?;
                 command.run()
             },
+            CommandType::DeletePlayer => {
+                let command = DeletePlayer::parse(&self.get_args(), &self.get_optional_args())?;
+                command.run()
+            },
             CommandType::Invalid => {
                 Err("Invalid or missing command.".to_string())
             }
@@ -52,6 +58,7 @@ impl Command {
     pub fn parse(args: &[String]) -> Result<Command, String> {
         let command_type = match args.get(0).map(|s| s.as_str()) {
             Some("add-player") => CommandType::AddPlayer,
+            Some("delete-player") => CommandType::DeletePlayer,
             _ => CommandType::Invalid
         };
 
