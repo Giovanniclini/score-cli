@@ -1,5 +1,5 @@
 use crate::commands::models::player;
-use crate::commands::utils::file_wrapper::{FileWrapper, FileWrapperOptions};
+use crate::commands::utils::{file_wrapper::FileWrapper, file_wrapper::FileWrapperOptions, storage::Storage};
 use std::collections::HashMap;
 
 const FILE_NAME_DATA: &str = "players.json";
@@ -32,21 +32,14 @@ impl AddPlayer {
 
         if file.is_empty()? {
             let players = player::Players::from_players(vec![self.player.clone()]);
-            file.serialize_to_file(&players)?;
+            file.save(&players)?;
         } else {
-            let mut players: player::Players = file.deserialize_from_file()?;
+            let mut players: player::Players = file.load()?;
             players.add_player(self.player.clone());
-            file.serialize_to_file(&players)?;
+            file.save(&players)?;
         }
         println!("Added player {}.", self.player.get_name());
 
         Ok(())
     }
-}
-
-#[cfg(test)]
-mod tests {
-    //use super::*;
-
-    
 }
