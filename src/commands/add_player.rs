@@ -31,7 +31,7 @@ impl AddPlayer {
         let mut file = FileWrapper::from_string(FILE_NAME_DATA, players_file_path, file_options)?;
 
         if file.is_empty()? {
-            let players = player::Players::from_players(vec![self.player.clone()]);
+            let players = player::Players::from_players(HashMap::from([(self.player.get_name().to_string(), self.player.clone())]));
             file.save(&players)?;
         } else {
             let mut players: player::Players = file.load()?;

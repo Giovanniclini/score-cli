@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use std::collections::HashMap;
 
 pub const PLAYER_FIELD_COUNT: usize = 1;
 
@@ -9,7 +10,7 @@ pub struct Player {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Players {
-    players: Vec<Player>
+    players: HashMap<String, Player>
 }
 
 impl Player {
@@ -24,27 +25,23 @@ impl Player {
 
 impl Players {
 
-    pub fn from_players(players: Vec<Player>) -> Players {
+    pub fn from_players(players: HashMap<String, Player>) -> Players {
         Players {
             players: players
         }
     }
 
     pub fn add_player(&mut self, player: Player) {
-        self.players.push(player.clone());
+        self.players.insert(player.get_name().to_string(), player.clone());
     }
 
     pub fn remove_player(&mut self, player: Player) -> Result<(), String> {
 
-        let mut i = 0;
-        while i < self.players.len() {
-            if self.players[i].get_name() == player.get_name() {
-                self.players.remove(i);
-                return Ok(());
-            }
-            i+=1;
+        if let None = self.players.remove(player.get_name()) {
+            return Err(format!("Player {} not found.", player.get_name()));
         }
-        
-        Err(format!("Player {} not found.", player.get_name()))
+
+        Ok(())
+
     }
 }
