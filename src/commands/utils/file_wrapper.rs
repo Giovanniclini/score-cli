@@ -90,3 +90,74 @@ impl FileWrapper {
 
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+    use serde::{Serialize, Deserialize};
+    use std::io::Seek;
+
+    #[derive(Serialize, Deserialize, PartialEq, Debug)]
+    struct DummyData {
+        name: String,
+        value: i32,
+    }
+
+    fn create_test_filewrapper(file_name: &str) -> FileWrapper {
+        let dir = tempdir().unwrap();
+        let dir_path = dir.path().to_str().unwrap().to_string();
+
+        FileWrapper::from_string(
+            file_name,
+            Some(&dir_path),
+            FileWrapperOptions::default()
+        ).unwrap()
+    }
+
+    #[test]
+    fn test_save_and_load() {
+        let mut file = create_test_filewrapper("test_file.json");
+
+        let data = DummyData {
+            name: "Test".to_string(),
+            value: 42,
+        };
+
+        file.save(&data).unwrap();
+
+        let loaded: DummyData = file.load().unwrap();
+        assert_eq!(data, loaded);
+    }
+
+    #[test]
+    fn test_is_empty_true_on_new_file() {
+        let mut file = create_test_filewrapper("empty.json");
+        assert!(file.is_empty().unwrap());
+    }
+
+    #[test]
+    fn test_is_empty_false_after_save() {
+        let mut file = create_test_filewrapper("not_empty.json");
+
+        let data = DummyData {
+            name: "Filled".to_string(),
+            value: 10,
+        };
+        file.save(&data).unwrap();
+
+        assert!(!file.is_empty().unwrap());
+    }
+
+    #[test]
+    fn test_get_data_error_on_invalid_file() {
+        let mut file = create_test_filewrapper("invalid.json");
+
+        file.file.set_len(0).unwrap();
+        file.file.rewind().unwrap();
+        file.file.write_all(b"{invalid json").unwrap();
+
+        let result: Result<DummyData, _> = file.load();
+        assert!(result.is_err());
+    }
+}
+
