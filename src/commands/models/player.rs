@@ -13,7 +13,7 @@ pub struct Players {
 }
 
 impl Player {
-    pub fn from_name(player_name: String) -> Player {
+    pub fn new(player_name: String) -> Player {
         Player { player_name: player_name }
     }
 
@@ -23,6 +23,13 @@ impl Player {
 }
 
 impl Players {
+
+    pub fn from_players(players: Vec<Player>) -> Players {
+        Players {
+            players: players
+        }
+    }
+
     pub fn add_player(&mut self, player: Player) {
         self.players.push(player.clone());
     }

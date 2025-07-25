@@ -2,6 +2,7 @@ use crate::commands::add_player::AddPlayer;
 use std::collections::HashMap;
 
 mod models;
+mod utils;
 mod add_player;
 
 #[derive(Debug)]
@@ -36,14 +37,14 @@ impl Command {
         self.optional_args.to_owned()
     }
 
-    pub fn run(&self) -> Result<(), &'static str> {
+    pub fn run(&self) -> Result<(), String> {
         match &self.command {
             CommandType::AddPlayer => {
                 let command = AddPlayer::parse(&self.get_args(), &self.get_optional_args())?;
                 command.run()
             },
             CommandType::Invalid => {
-                Err("Invalid or missing command.")
+                Err("Invalid or missing command.".to_string())
             }
         }
     }
