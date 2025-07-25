@@ -35,7 +35,7 @@ impl AddPlayer {
             file.save(&players)?;
         } else {
             let mut players: player::Players = file.load()?;
-            players.add_player(self.player.clone());
+            players.add_player(self.player.clone())?;
             file.save(&players)?;
         }
         println!("Added player {}.", self.player.get_name());

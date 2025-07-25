@@ -31,8 +31,14 @@ impl Players {
         }
     }
 
-    pub fn add_player(&mut self, player: Player) {
+    pub fn add_player(&mut self, player: Player) -> Result<(), String> {
+        if let Some(player) = self.players.get(player.get_name()){
+            return Err(format!("Player {} already exists.", player.get_name()));
+        }
+
         self.players.insert(player.get_name().to_string(), player.clone());
+        Ok(())
+        
     }
 
     pub fn remove_player(&mut self, player: Player) -> Result<(), String> {
