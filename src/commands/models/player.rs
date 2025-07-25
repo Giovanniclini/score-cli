@@ -33,4 +33,18 @@ impl Players {
     pub fn add_player(&mut self, player: Player) {
         self.players.push(player.clone());
     }
+
+    pub fn remove_player(&mut self, player: Player) -> Result<(), String> {
+
+        let mut i = 0;
+        while i < self.players.len() {
+            if self.players[i].get_name() == player.get_name() {
+                self.players.remove(i);
+                return Ok(());
+            }
+            i+=1;
+        }
+        
+        Err(format!("Player {} not found.", player.get_name()))
+    }
 }

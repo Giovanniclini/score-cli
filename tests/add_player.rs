@@ -9,13 +9,13 @@ fn test_cli_add_player_creates_file_with_player() {
     let temp_path = temp.path().to_str().unwrap();
 
     let mut cmd = Command::cargo_bin("score-cli").unwrap();
-    cmd.args(&["add-player", "Giovanni", "--save-dir", temp_path])
+    cmd.args(&["add-player", "player-name", "--save-dir", temp_path])
         .assert()
         .success();
 
     let player_file_path = temp.path().join("players.json");
     let content = fs::read_to_string(player_file_path).unwrap();
-    assert!(content.contains("Giovanni"));
+    assert!(content.contains("player-name"));
 }
 
 #[test]
