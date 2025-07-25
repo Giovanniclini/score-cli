@@ -24,6 +24,6 @@ impl Player {
 
 impl Players {
     pub fn add_player(&mut self, player: Player) {
-        &self.players.push(player.clone());
+        self.players.push(player.clone());
     }
 }
