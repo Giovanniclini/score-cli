@@ -5,6 +5,7 @@ use crate::commands::utils::{file_wrapper::FileWrapper, file_wrapper::FileWrappe
 use std::collections::HashMap;
 
 const ADMITTED_OPTIONAL_ARGUMENTS: [&str; 2] = [SAVE_DIR_OPTIONAL_ARGUMENT, TIME_OPTIONAL_ARGUMENT];
+const GAMES_FOLER: &str = "games";
 
 #[derive(Debug)]
 pub struct AddScore {
@@ -38,7 +39,7 @@ impl AddScore {
         let file_name = format!("{}.json", self.game.get_name());
 
         let file_options = FileWrapperOptions::default();
-        let mut file = FileWrapper::from_string(&["games", &file_name], data_file_path, file_options)?;
+        let mut file = FileWrapper::from_string(&[GAMES_FOLER, &file_name], data_file_path, file_options)?;
 
         if file.is_empty()? {
             let games = game::Games::from_games(vec![self.game.clone()]);
