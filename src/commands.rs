@@ -15,8 +15,8 @@ enum CommandType {
     Invalid
 }
 
-// TODO?: config to specify optional arguments for each command.
-const OPTIONAL_ARGUMENTS: [&str; 2] = ["--save-dir", "--time"];
+pub const SAVE_DIR_OPTIONAL_ARGUMENT: &str = "--save-dir";
+pub const TIME_OPTIONAL_ARGUMENT: &str = "--time";
 
 pub struct Command {
     command: CommandType,
@@ -45,15 +45,15 @@ impl Command {
     pub fn run(&self) -> Result<(), String> {
         match &self.command {
             CommandType::AddPlayer => {
-                let command = AddPlayer::parse(&self.get_args(), &self.get_optional_args())?;
+                let command = AddPlayer::create(&self.get_args(), &self.get_optional_args())?;
                 command.run()
             },
             CommandType::DeletePlayer => {
-                let command = DeletePlayer::parse(&self.get_args(), &self.get_optional_args())?;
+                let command = DeletePlayer::create(&self.get_args(), &self.get_optional_args())?;
                 command.run()
             },
             CommandType::AddScore => {
-                let command = AddScore::parse(&self.get_args(), &self.get_optional_args())?;
+                let command = AddScore::create(&self.get_args(), &self.get_optional_args())?;
                 command.run()
             },
             CommandType::Invalid => {
@@ -108,7 +108,7 @@ fn get_optional_args(args: &[String]) -> Result<HashMap<String, String>, String>
     let mut i = 0;
     while i < args.len() {
 
-        if OPTIONAL_ARGUMENTS.contains(&args[i].as_str()) {
+        if [TIME_OPTIONAL_ARGUMENT, SAVE_DIR_OPTIONAL_ARGUMENT].contains(&args[i].as_str()) {
             if i + 1 < args.len() {
                 if args[i+1].as_str().starts_with("--") {
                     return Err(format!("Missing value for optional argument {}", args[i]))

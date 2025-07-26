@@ -1,8 +1,11 @@
+use crate::commands::{SAVE_DIR_OPTIONAL_ARGUMENT};
 use crate::commands::models::player;
 use crate::commands::utils::{file_wrapper::FileWrapper, file_wrapper::FileWrapperOptions, storage::Storage};
 use std::collections::HashMap;
 
 const FILE_NAME_DATA: &str = "players.json";
+
+const ADMITTED_OPTIONAL_ARGUMENTS: [&str; 1] = [SAVE_DIR_OPTIONAL_ARGUMENT];
 
 #[derive(Debug)]
 pub struct AddPlayer {
@@ -11,7 +14,14 @@ pub struct AddPlayer {
 }
 
 impl AddPlayer {
-    pub fn parse(args: &[String], optional_args: &HashMap<String, String>) -> Result<AddPlayer, String> {
+    pub fn create(args: &[String], optional_args: &HashMap<String, String>) -> Result<AddPlayer, String> {
+
+        for (key, _) in optional_args {
+            if !ADMITTED_OPTIONAL_ARGUMENTS.contains(&key.as_str()) {
+                return Err(format!("Unknown optional command for add-player {}.", key));
+            }
+        }
+
         if args.len() != player::PLAYER_FIELD_COUNT {
             return Err("Invalid number of arguments for add-player.".to_string())
         }
@@ -25,7 +35,7 @@ impl AddPlayer {
     }
 
     pub fn run(&self) -> Result<(), String> {
-        let players_file_path = self.optional_args.get("--save-dir");
+        let players_file_path = self.optional_args.get(SAVE_DIR_OPTIONAL_ARGUMENT);
 
         let file_options = FileWrapperOptions::default();
         let mut file = FileWrapper::from_string(FILE_NAME_DATA, players_file_path, file_options)?;
