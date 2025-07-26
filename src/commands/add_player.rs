@@ -1,9 +1,8 @@
 use crate::commands::{SAVE_DIR_OPTIONAL_ARGUMENT};
+use crate::commands::models::player::FILE_NAME_DATA;
 use crate::commands::models::player;
 use crate::commands::utils::{file_wrapper::FileWrapper, file_wrapper::FileWrapperOptions, storage::Storage};
 use std::collections::HashMap;
-
-const FILE_NAME_DATA: &str = "players.json";
 
 const ADMITTED_OPTIONAL_ARGUMENTS: [&str; 1] = [SAVE_DIR_OPTIONAL_ARGUMENT];
 

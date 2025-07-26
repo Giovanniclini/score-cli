@@ -3,6 +3,8 @@ use std::collections::HashMap;
 
 pub const PLAYER_FIELD_COUNT: usize = 1;
 
+pub const FILE_NAME_DATA: &str = "players.json";
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Player {
     player_name: String
@@ -49,5 +51,13 @@ impl Players {
 
         Ok(())
 
+    }
+
+    pub fn exists(&self, player: Player) -> bool {
+        if let Some(_) = self.players.get(player.get_name()) {
+            true
+        } else {
+            false
+        }
     }
 }

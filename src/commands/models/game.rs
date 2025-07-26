@@ -59,6 +59,10 @@ impl Game {
     pub fn get_id(&self) -> &Uuid {
         &self.id
     }
+
+    pub fn get_scores(&self) -> &HashMap<String, usize> {
+        &self.scores
+    }
 }
 
 impl Games {

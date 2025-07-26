@@ -1,4 +1,5 @@
 use crate::commands::{TIME_OPTIONAL_ARGUMENT, SAVE_DIR_OPTIONAL_ARGUMENT};
+use crate::commands::models::player;
 use crate::commands::models::game;
 use crate::commands::utils::{file_wrapper::FileWrapper, file_wrapper::FileWrapperOptions, storage::Storage};
 use std::collections::HashMap;
@@ -29,12 +30,15 @@ impl AddScore {
     }
 
     pub fn run(&self) -> Result<(), String> {
-        // TODO: Check for player existance
-        let game_file_path = self.optional_args.get(SAVE_DIR_OPTIONAL_ARGUMENT);
+
+        let data_file_path = self.optional_args.get(SAVE_DIR_OPTIONAL_ARGUMENT);
+
+        self.check_players_existance()?;
+
         let file_name = format!("{}.json", self.game.get_name());
 
         let file_options = FileWrapperOptions::default();
-        let mut file = FileWrapper::from_string(&file_name, game_file_path, file_options)?;
+        let mut file = FileWrapper::from_string(&file_name, data_file_path, file_options)?;
 
         if file.is_empty()? {
             let games = game::Games::from_games(vec![self.game.clone()]);
@@ -45,6 +49,27 @@ impl AddScore {
             file.save(&games)?;
         }
         println!("Added game of {} with id: {}.", self.game.get_name(), self.game.get_id());
+
+        Ok(())
+    }
+
+    fn check_players_existance(&self) -> Result<(), String> {
+        let data_file_path = self.optional_args.get(SAVE_DIR_OPTIONAL_ARGUMENT);
+
+        let file_options = FileWrapperOptions::default();
+        let mut player_file = FileWrapper::from_string(player::FILE_NAME_DATA, data_file_path, file_options)?;
+
+        if player_file.is_empty()? {
+            return Err("No Players' data found.".to_string());
+        } else {
+            let players: player::Players = player_file.load()?;
+            for (player, _) in self.game.get_scores() {
+                let player_to_check = player::Player::new(player.to_string());
+                if !players.exists(player_to_check) {
+                    return Err(format!("Player {} does not exist.", player));
+                }
+            }
+        }
 
         Ok(())
     }
