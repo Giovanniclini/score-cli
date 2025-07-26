@@ -37,7 +37,7 @@ impl AddPlayer {
         let players_file_path = self.optional_args.get(SAVE_DIR_OPTIONAL_ARGUMENT);
 
         let file_options = FileWrapperOptions::default();
-        let mut file = FileWrapper::from_string(FILE_NAME_DATA, players_file_path, file_options)?;
+        let mut file = FileWrapper::from_string(&[FILE_NAME_DATA], players_file_path, file_options)?;
 
         if file.is_empty()? {
             let players = player::Players::from_players(HashMap::from([(self.player.get_name().to_string(), self.player.clone())]));

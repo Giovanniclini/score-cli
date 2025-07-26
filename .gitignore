@@ -26,4 +26,5 @@ target
 /target
 
 # Data files
-*.json
+/games
+players.json

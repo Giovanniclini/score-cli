@@ -23,8 +23,8 @@ fn test_cli_add_score_creates_file_with_scores() {
         .assert()
         .success();
 
-    let player_file_path = temp.path().join("catan.json");
-    let content = fs::read_to_string(player_file_path).unwrap();
+    let score_file_path = temp.path().join("games").join("catan.json");
+    let content = fs::read_to_string(score_file_path).unwrap();
     assert!(content.contains("player-name1"));
     assert!(content.contains("player-name2"));
 }
@@ -49,8 +49,8 @@ fn test_cli_add_score_creates_file_with_scores_and_time() {
         .assert()
         .success();
 
-    let player_file_path = temp.path().join("catan.json");
-    let content = fs::read_to_string(player_file_path).unwrap();
+    let score_file_path = temp.path().join("games").join("catan.json");
+    let content = fs::read_to_string(score_file_path).unwrap();
     assert!(content.contains("player-name1"));
     assert!(content.contains("player-name2"));
     assert!(content.contains("2025-01-01"));
