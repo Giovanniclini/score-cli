@@ -1,19 +1,22 @@
-use crate::commands::{add_player::AddPlayer, delete_player::DeletePlayer};
+use crate::commands::{add_player::AddPlayer, delete_player::DeletePlayer, add_score::AddScore};
 use std::collections::HashMap;
 
 mod models;
 mod utils;
 mod add_player;
 mod delete_player;
+mod add_score;
 
 #[derive(Debug)]
 enum CommandType {
     AddPlayer,
     DeletePlayer,
+    AddScore,
     Invalid
 }
 
-const OPTIONAL_ARGUMENTS: [&str; 1] = ["--save-dir"];
+// TODO?: config to specify optional arguments for each command.
+const OPTIONAL_ARGUMENTS: [&str; 2] = ["--save-dir", "--time"];
 
 pub struct Command {
     command: CommandType,
@@ -49,6 +52,10 @@ impl Command {
                 let command = DeletePlayer::parse(&self.get_args(), &self.get_optional_args())?;
                 command.run()
             },
+            CommandType::AddScore => {
+                let command = AddScore::parse(&self.get_args(), &self.get_optional_args())?;
+                command.run()
+            },
             CommandType::Invalid => {
                 Err("Invalid or missing command.".to_string())
             }
@@ -59,6 +66,7 @@ impl Command {
         let command_type = match args.get(0).map(|s| s.as_str()) {
             Some("add-player") => CommandType::AddPlayer,
             Some("delete-player") => CommandType::DeletePlayer,
+            Some("add-score") => CommandType::AddScore,
             _ => CommandType::Invalid
         };
 
