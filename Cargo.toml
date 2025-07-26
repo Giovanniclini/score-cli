@@ -11,3 +11,10 @@ chrono = { version = "0.4", features = ["serde"] }
 tempfile = "3"
 assert_cmd = "2"
 predicates = "3"
+
+[dependencies.uuid]
+version = "1.17.0"
+features = [
+    "v4",
+    "serde",
+]

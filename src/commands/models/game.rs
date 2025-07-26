@@ -1,9 +1,11 @@
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 use chrono::prelude::*;
+use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Game {
+    id: Uuid,
     game_name: String,
     scores: HashMap<String, usize>,
     time: NaiveDate
@@ -29,13 +31,12 @@ impl Game {
             None => Utc::now().date_naive()
         };
 
-        Ok(Game {game_name: gamename, scores: parsed_scores, time: time})
+        Ok(Game {id: Uuid::new_v4(), game_name: gamename, scores: parsed_scores, time: time})
 
     }
 
     fn parse_scores(scores: &[String]) -> Result<HashMap<String, usize>, String> {
         let mut hashed_scores = HashMap::new();
-        dbg!(scores);
         for score in scores {
             let vec_score: Vec<&str> = score.as_str().split("::").collect();
             if vec_score.len() != 2 {
@@ -53,6 +54,10 @@ impl Game {
 
     pub fn get_name(&self) -> &str {
         &self.game_name
+    }
+
+    pub fn get_id(&self) -> &Uuid {
+        &self.id
     }
 }
 

@@ -44,7 +44,7 @@ impl AddScore {
             games.add_game(self.game.clone());
             file.save(&games)?;
         }
-        println!("Added game of {}.", self.game.get_name());
+        println!("Added game of {} with id: {}.", self.game.get_name(), self.game.get_id());
 
         Ok(())
     }
