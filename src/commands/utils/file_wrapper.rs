@@ -1,7 +1,7 @@
 use crate::commands::utils::storage::Storage;
 use crate::commands::utils::utils::create_path;
 use std::path::PathBuf;
-use std::fs::{File, OpenOptions};
+use std::fs::{File, OpenOptions, create_dir_all};
 use std::io::{Read, Write, Seek};
 use serde::{Serialize, de::DeserializeOwned};
 
@@ -72,9 +72,14 @@ impl Storage for FileWrapper {
 }
 
 impl FileWrapper {
-    pub fn from_string(file_name: &str, dir: Option<&String>, options: FileWrapperOptions) -> Result<FileWrapper, String> {
+    pub fn from_string(path: &[&str], base_dir: Option<&String>, options: FileWrapperOptions) -> Result<FileWrapper, String> {
 
-        let file_path = create_path(file_name, dir)?;
+        let file_path = create_path(path, base_dir)?;
+
+        if let Some(parent_dir) = file_path.parent() {
+            create_dir_all(parent_dir)
+                .map_err(|e| format!("Failed to create directories for path {}: {}", file_path.display(), e))?;
+        }
 
         let players_file = OpenOptions::new()
             .read(options.read)
@@ -108,7 +113,7 @@ mod tests {
         let dir_path = dir.path().to_str().unwrap().to_string();
 
         FileWrapper::from_string(
-            file_name,
+            &[file_name],
             Some(&dir_path),
             FileWrapperOptions::default()
         ).unwrap()

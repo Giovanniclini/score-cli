@@ -38,7 +38,7 @@ impl AddScore {
         let file_name = format!("{}.json", self.game.get_name());
 
         let file_options = FileWrapperOptions::default();
-        let mut file = FileWrapper::from_string(&file_name, data_file_path, file_options)?;
+        let mut file = FileWrapper::from_string(&["games", &file_name], data_file_path, file_options)?;
 
         if file.is_empty()? {
             let games = game::Games::from_games(vec![self.game.clone()]);
@@ -57,7 +57,7 @@ impl AddScore {
         let data_file_path = self.optional_args.get(SAVE_DIR_OPTIONAL_ARGUMENT);
 
         let file_options = FileWrapperOptions::default();
-        let mut player_file = FileWrapper::from_string(player::FILE_NAME_DATA, data_file_path, file_options)?;
+        let mut player_file = FileWrapper::from_string(&[player::FILE_NAME_DATA], data_file_path, file_options)?;
 
         if player_file.is_empty()? {
             return Err("No Players' data found.".to_string());
