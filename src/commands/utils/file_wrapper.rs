@@ -35,7 +35,7 @@ impl Storage for FileWrapper {
 
     fn save(&mut self, entity: &impl Serialize) -> Result<(), String> {
 
-        let data_serialized = serde_json::to_string(entity).unwrap();
+        let data_serialized = serde_json::to_string_pretty(entity).unwrap();
         self.file.set_len(0).map_err(|e| format!("Truncation error: {}", e))?;
         self.file.rewind().map_err(|e| format!("Rewind error: {}", e))?;
         self.file.write_all(data_serialized.as_bytes())

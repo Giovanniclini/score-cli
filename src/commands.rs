@@ -1,19 +1,22 @@
-use crate::commands::{add_player::AddPlayer, delete_player::DeletePlayer};
+use crate::commands::{add_player::AddPlayer, delete_player::DeletePlayer, add_score::AddScore};
 use std::collections::HashMap;
 
 mod models;
 mod utils;
 mod add_player;
 mod delete_player;
+mod add_score;
 
 #[derive(Debug)]
 enum CommandType {
     AddPlayer,
     DeletePlayer,
+    AddScore,
     Invalid
 }
 
-const OPTIONAL_ARGUMENTS: [&str; 1] = ["--save-dir"];
+pub const SAVE_DIR_OPTIONAL_ARGUMENT: &str = "--save-dir";
+pub const TIME_OPTIONAL_ARGUMENT: &str = "--time";
 
 pub struct Command {
     command: CommandType,
@@ -42,11 +45,15 @@ impl Command {
     pub fn run(&self) -> Result<(), String> {
         match &self.command {
             CommandType::AddPlayer => {
-                let command = AddPlayer::parse(&self.get_args(), &self.get_optional_args())?;
+                let command = AddPlayer::create(&self.get_args(), &self.get_optional_args())?;
                 command.run()
             },
             CommandType::DeletePlayer => {
-                let command = DeletePlayer::parse(&self.get_args(), &self.get_optional_args())?;
+                let command = DeletePlayer::create(&self.get_args(), &self.get_optional_args())?;
+                command.run()
+            },
+            CommandType::AddScore => {
+                let command = AddScore::create(&self.get_args(), &self.get_optional_args())?;
                 command.run()
             },
             CommandType::Invalid => {
@@ -59,6 +66,7 @@ impl Command {
         let command_type = match args.get(0).map(|s| s.as_str()) {
             Some("add-player") => CommandType::AddPlayer,
             Some("delete-player") => CommandType::DeletePlayer,
+            Some("add-score") => CommandType::AddScore,
             _ => CommandType::Invalid
         };
 
@@ -100,7 +108,7 @@ fn get_optional_args(args: &[String]) -> Result<HashMap<String, String>, String>
     let mut i = 0;
     while i < args.len() {
 
-        if OPTIONAL_ARGUMENTS.contains(&args[i].as_str()) {
+        if [TIME_OPTIONAL_ARGUMENT, SAVE_DIR_OPTIONAL_ARGUMENT].contains(&args[i].as_str()) {
             if i + 1 < args.len() {
                 if args[i+1].as_str().starts_with("--") {
                     return Err(format!("Missing value for optional argument {}", args[i]))
