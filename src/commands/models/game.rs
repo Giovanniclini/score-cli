@@ -18,11 +18,17 @@ impl Game {
     pub fn build(gamename: String, scores: Vec<String>, time: Option<&str>) -> Result<Game, String> {
 
         let parsed_scores = Self::parse_scores(&scores)?;
+
+        if parsed_scores.len() == 0 {
+            return Err("No scores provided.".to_string());
+        }
+
         let time = match time {
             Some(time) => NaiveDate::parse_from_str(&time, "%Y-%m-%d")
                                             .map_err(|_| "Error parsing date. The input format is YYYY-MM-DD.".to_string())?,
             None => Utc::now().date_naive()
         };
+
         Ok(Game {game_name: gamename, scores: parsed_scores, time: time})
 
     }
@@ -39,6 +45,9 @@ impl Game {
             let score: usize = vec_score[1].parse().map_err(|_| "Error parsing scores. The input format is player::score.".to_string())?;
             hashed_scores.insert(player, score);
         }
+
+
+
         Ok(hashed_scores)
     }
 

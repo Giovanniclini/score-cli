@@ -53,3 +53,43 @@ impl AddPlayer {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_create_valid_input() {
+        let args = vec!["player-name".to_string()];
+        let mut optional_args = HashMap::new();
+        optional_args.insert(SAVE_DIR_OPTIONAL_ARGUMENT.to_string(), "path/to/dir".to_string());
+
+        let result = AddPlayer::create(&args, &optional_args);
+        assert!(result.is_ok());
+
+        let add_player = result.unwrap();
+        assert_eq!(add_player.player.get_name(), "player-name");
+        assert_eq!(add_player.optional_args.get(SAVE_DIR_OPTIONAL_ARGUMENT), Some(&"path/to/dir".to_string()));
+    }
+
+    #[test]
+    fn test_create_invalid_number_of_args() {
+        let args = vec![]; 
+        let optional_args = HashMap::new();
+
+        let result = AddPlayer::create(&args, &optional_args);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Invalid number of arguments for add-player.");
+    }
+
+    #[test]
+    fn test_create_unknown_optional_argument() {
+        let args = vec!["player-name".to_string()];
+        let mut optional_args = HashMap::new();
+        optional_args.insert("--unknown-flag".to_string(), "value".to_string());
+
+        let result = AddPlayer::create(&args, &optional_args);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Unknown optional command for add-player --unknown-flag.");
+    }
+}

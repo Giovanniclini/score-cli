@@ -49,3 +49,47 @@ impl AddScore {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_create_valid_input() {
+        let args = vec![
+            "Catan".to_string(),
+            "player1-name::10".to_string(),
+            "player2-name::8".to_string(),
+        ];
+        let mut optional_args = HashMap::new();
+        optional_args.insert(TIME_OPTIONAL_ARGUMENT.to_string(), "2025-07-25".to_string());
+
+        let result = AddScore::create(&args, &optional_args);
+        assert!(result.is_ok());
+
+        let add_score = result.unwrap();
+        assert_eq!(add_score.game.get_name(), "Catan");
+        assert_eq!(add_score.optional_args.get(TIME_OPTIONAL_ARGUMENT), Some(&"2025-07-25".to_string()));
+    }
+
+    #[test]
+    fn test_create_with_unknown_optional_arg() {
+        let args = vec!["Catan".to_string(), "player1-name::10".to_string()];
+        let mut optional_args = HashMap::new();
+        optional_args.insert("--unknown".to_string(), "value".to_string());
+
+        let result = AddScore::create(&args, &optional_args);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Unknown optional command for add-score --unknown.");
+    }
+
+    #[test]
+    fn test_create_game_build_failure() {
+        let args = vec!["Catan".to_string()];
+        let optional_args = HashMap::new();
+
+        let result = AddScore::create(&args, &optional_args);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("No scores provided."));
+    }
+}

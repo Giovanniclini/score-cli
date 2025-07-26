@@ -51,3 +51,56 @@ impl DeletePlayer {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_create_valid_input() {
+        let args = vec!["player-name".to_string()];
+        let mut optional_args = HashMap::new();
+        optional_args.insert(SAVE_DIR_OPTIONAL_ARGUMENT.to_string(), "some/path".to_string());
+
+        let result = DeletePlayer::create(&args, &optional_args);
+        assert!(result.is_ok());
+
+        let command = result.unwrap();
+        assert_eq!(command.player.get_name(), "player-name");
+        assert_eq!(command.optional_args.get(SAVE_DIR_OPTIONAL_ARGUMENT), Some(&"some/path".to_string()));
+    }
+
+    #[test]
+    fn test_create_with_unknown_optional_arg() {
+        let args = vec!["player-name".to_string()];
+        let mut optional_args = HashMap::new();
+        optional_args.insert("--unknown".to_string(), "value".to_string());
+
+        let result = DeletePlayer::create(&args, &optional_args);
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err(),
+            "Unknown optional command for add-player --unknown."
+        );
+    }
+
+    #[test]
+    fn test_create_with_missing_arguments() {
+        let args: Vec<String> = vec![]; 
+        let optional_args = HashMap::new();
+
+        let result = DeletePlayer::create(&args, &optional_args);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Invalid number of arguments for delete-player.");
+    }
+
+    #[test]
+    fn test_create_with_extra_arguments() {
+        let args = vec!["Alice".to_string(), "Extra".to_string()];
+        let optional_args = HashMap::new();
+
+        let result = DeletePlayer::create(&args, &optional_args);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Invalid number of arguments for delete-player.");
+    }
+}
