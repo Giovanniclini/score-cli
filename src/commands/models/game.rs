@@ -13,7 +13,7 @@ pub struct Game {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Games {
-    games: Vec<Game>
+    games: HashMap<Uuid, Game>
 }
 
 impl Game {
@@ -47,8 +47,6 @@ impl Game {
             hashed_scores.insert(player, score);
         }
 
-
-
         Ok(hashed_scores)
     }
 
@@ -66,12 +64,20 @@ impl Game {
 }
 
 impl Games {
-    pub fn from_games(games: Vec<Game>) -> Games {
+    pub fn from_games(games: HashMap<Uuid, Game>) -> Games {
         Games{ games: games }
     }
 
     pub fn add_game(&mut self, game: Game) {
-        self.games.push(game);
+        self.games.insert(*game.get_id(), game);
+    }
+
+    pub fn delete(&mut self, game_id: Uuid) -> Result<Game, String> {
+        if let Some(game) = self.games.remove(&game_id) {
+            Ok(game)
+        } else {
+            Err("Game not found.".to_string())
+        }
     }
 }
 

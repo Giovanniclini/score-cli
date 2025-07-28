@@ -10,6 +10,7 @@ pub struct FileWrapper {
     file: File
 }
 
+#[derive(Clone)]
 pub struct FileWrapperOptions {
     read: bool,
     write: bool,
@@ -90,6 +91,25 @@ impl FileWrapper {
         match players_file {
             Ok(file) => Ok(FileWrapper{path: file_path, file: file}),
             Err(_err) => Err(format!("An error occured while trying to open: {}", file_path.display()))
+        }
+    }
+
+    pub fn from_path(path: PathBuf, options: FileWrapperOptions) -> Result<FileWrapper, String> {
+
+        if let Some(parent_dir) = path.parent() {
+            create_dir_all(parent_dir)
+                .map_err(|e| format!("Failed to create directories for path {}: {}", path.display(), e))?;
+        }
+
+        let players_file = OpenOptions::new()
+            .read(options.read)
+            .write(options.write)
+            .create(options.create)
+            .open(&path);
+
+        match players_file {
+            Ok(file) => Ok(FileWrapper{path: path, file: file}),
+            Err(_err) => Err(format!("An error occured while trying to open: {}", path.display()))
         }
     }
 
