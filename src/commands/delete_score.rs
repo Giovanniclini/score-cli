@@ -41,17 +41,18 @@ impl DeleteScore {
         let file_options = FileWrapperOptions::default();
         let game_dir = create_path(&[GAMES_FOLER], data_file_path)?;
 
-        let game_files =  fs::read_dir(game_dir).map_err(|_| "An error occurred while accessing the data.")?
+        let game_files =  fs::read_dir(&game_dir).map_err(|_| "An error occurred while accessing the data.")?
                 .map(|res| res.map(|e| e.path()))
                 .collect::<Result<Vec<_>, io::Error>>().map_err(|_| "An error occurred whil accessing the data.")?;
 
         for game_file in game_files {
             let mut file = FileWrapper::from_path(game_file, file_options.clone())?;
             let mut games: game::Games = file.load()?;
-            let uuid = Uuid::from_str(&self.game_id).map_err(|_| format!("Game with id {} not found.", self.game_id))?;
+            let uuid = Uuid::from_str(&self.game_id).map_err(|_| format!("Impossible to decode id {}.", self.game_id))?;
             if let Ok(game) = games.delete(uuid) {
+                file.save(&games)?;
                 println!("Removed game with id {}.", game.get_id());
-                break;
+                return Ok(());
             }
         }
 
