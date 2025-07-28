@@ -18,7 +18,7 @@ impl DeletePlayer {
 
         for (key, _) in optional_args {
             if !ADMITTED_OPTIONAL_ARGUMENTS.contains(&key.as_str()) {
-                return Err(format!("Unknown optional command for add-player {}.", key));
+                return Err(format!("Unknown optional command for delete-player {}.", key));
             }
         }
 
@@ -80,7 +80,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err(),
-            "Unknown optional command for add-player --unknown."
+            "Unknown optional command for delete-player --unknown."
         );
     }
 

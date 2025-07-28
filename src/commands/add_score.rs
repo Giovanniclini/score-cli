@@ -42,7 +42,7 @@ impl AddScore {
         let mut file = FileWrapper::from_string(&[GAMES_FOLER, &file_name], data_file_path, file_options)?;
 
         if file.is_empty()? {
-            let games = game::Games::from_games(vec![self.game.clone()]);
+            let games = game::Games::from_games(HashMap::from([(self.game.get_id().clone(), self.game.clone())]));
             file.save(&games)?;
         } else {
             let mut games: game::Games = file.load()?;

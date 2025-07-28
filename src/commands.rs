@@ -1,4 +1,4 @@
-use crate::commands::{add_player::AddPlayer, delete_player::DeletePlayer, add_score::AddScore};
+use crate::commands::{add_player::AddPlayer, add_score::AddScore, delete_player::DeletePlayer, delete_score::DeleteScore};
 use std::collections::HashMap;
 
 mod models;
@@ -6,12 +6,14 @@ mod utils;
 mod add_player;
 mod delete_player;
 mod add_score;
+mod delete_score;
 
 #[derive(Debug)]
 enum CommandType {
     AddPlayer,
     DeletePlayer,
     AddScore,
+    DeleteScore,
     Invalid
 }
 
@@ -56,6 +58,10 @@ impl Command {
                 let command = AddScore::create(&self.get_args(), &self.get_optional_args())?;
                 command.run()
             },
+            CommandType::DeleteScore => {
+                let command = DeleteScore::create(&self.get_args(), &self.get_optional_args())?;
+                command.run()
+            },
             CommandType::Invalid => {
                 Err("Invalid or missing command.".to_string())
             }
@@ -67,6 +73,7 @@ impl Command {
             Some("add-player") => CommandType::AddPlayer,
             Some("delete-player") => CommandType::DeletePlayer,
             Some("add-score") => CommandType::AddScore,
+            Some("delete-score") => CommandType::DeleteScore,
             _ => CommandType::Invalid
         };
 
