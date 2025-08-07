@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use tabled::Tabled;
 use std::collections::HashMap;
 use chrono::prelude::*;
 use uuid::Uuid;
@@ -9,6 +10,32 @@ pub struct Game {
     game_name: String,
     scores: HashMap<String, usize>,
     time: NaiveDate
+}
+
+#[derive(Tabled)]
+pub struct GameRow {
+    id: String,
+    name: String,
+    date: String,
+    scores: String,
+}
+
+impl From<&Game> for GameRow {
+    fn from(game: &Game) -> Self {
+
+        let game_scores = game.get_scores()
+            .iter()
+            .map(|(player, score)| format!("{} {}", player, score))
+            .collect::<Vec<_>>()
+            .join(",");
+
+        GameRow {
+            id: game.get_id().to_string(),
+            name: game.get_name().to_string(),
+            date: game.get_datetime().to_string(),
+            scores: game_scores
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -50,6 +77,10 @@ impl Game {
         Ok(hashed_scores)
     }
 
+    pub fn get_datetime(&self) -> &NaiveDate {
+        &self.time
+    }
+
     pub fn get_name(&self) -> &str {
         &self.game_name
     }
@@ -64,8 +95,20 @@ impl Game {
 }
 
 impl Games {
-    pub fn from_games(games: HashMap<Uuid, Game>) -> Games {
-        Games{ games: games }
+    pub fn from_games(games: HashMap<Uuid, Game>) -> Self {
+        Self{ games: games }
+    }
+
+    pub fn create_empy() -> Self {
+        Self {games: HashMap::new()}
+    }
+
+    pub fn get_games(&self) -> &HashMap<Uuid, Game> {
+        &self.games
+    }
+
+    pub fn extend(&mut self, games: &Games) {
+        self.games.extend(games.get_games().iter().map(|(id, game)| (id.clone(), game.clone())))
     }
 
     pub fn add_game(&mut self, game: Game) {
@@ -79,6 +122,17 @@ impl Games {
             Err("Game not found.".to_string())
         }
     }
+
+    pub fn order_by_date(&self) -> Vec<Game> {
+        let mut games = self.games.iter().map(|(_id, game)| game.clone()).collect::<Vec<_>>();
+        games.sort_by_key(|g| g.time);
+        games
+    }
+
+}
+
+pub fn from_vec_to_game_rows(games: Vec<Game>) -> Vec<GameRow> {
+    games.iter().map(|game| GameRow::from(game)).collect()
 }
 
 #[cfg(test)]
