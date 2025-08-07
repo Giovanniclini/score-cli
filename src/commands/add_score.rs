@@ -5,7 +5,7 @@ use crate::commands::utils::{file_wrapper::FileWrapper, file_wrapper::FileWrappe
 use std::collections::HashMap;
 
 const ADMITTED_OPTIONAL_ARGUMENTS: [&str; 2] = [SAVE_DIR_OPTIONAL_ARGUMENT, TIME_OPTIONAL_ARGUMENT];
-const GAMES_FOLER: &str = "games";
+pub const GAMES_FOLER: &str = "games";
 
 #[derive(Debug)]
 pub struct AddScore {
