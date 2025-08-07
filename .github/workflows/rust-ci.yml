@@ -1,8 +1,14 @@
 name: Cargo Build & Test
 
 on:
-  push: [main, develop]
-  pull_request: [main, develop]
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
 
 env: 
   CARGO_TERM_COLOR: always
