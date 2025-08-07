@@ -51,10 +51,3 @@ impl ListGames {
     }
 
 }
-
-#[cfg(test)]
-mod tests {
-    //use super::*;
-
-    
-}
