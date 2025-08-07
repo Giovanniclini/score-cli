@@ -27,7 +27,7 @@ impl From<&Game> for GameRow {
             .iter()
             .map(|(player, score)| format!("{} {}", player, score))
             .collect::<Vec<_>>()
-            .join(",");
+            .join("\n");
 
         GameRow {
             id: game.get_id().to_string(),
