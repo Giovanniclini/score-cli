@@ -1,38 +1,38 @@
 # 🎯 score-cli
 
-**score-cli** è uno strumento da riga di comando scritto in Rust per gestire partite, giocatori e punteggi di giochi da tavolo.  
-Permette di aggiungere/rimuovere giocatori, registrare punteggi, visualizzare statistiche e consultare la cronologia delle partite.
+**score-cli** is a command-line tool written in Rust for managing board game matches, players, and scores.  
+It allows you to add/remove players, record scores, view statistics, and consult the match history.
 
 ---
 
-## ✨ Funzionalità
+## ✨ Features
 
-- **Gestione giocatori**
-  - `add-player`: aggiunge un nuovo giocatore.
-  - `delete-player`: rimuove un giocatore.
+- **Player management**
+  - `add-player`: adds a new player.
+  - `delete-player`: removes a player.
 
-- **Gestione punteggi**
-  - `add-score`: registra una nuova partita con i relativi punteggi.
-  - `delete-score`: rimuove una partita esistente tramite `id`.
+- **Score management**
+  - `add-score`: records a new match with the related scores.
+  - `delete-score`: removes an existing match by `id`.
   
-- **Consultazione**
-  - `list-games`: elenca tutte le partite in ordine cronologico.
+- **Consultation**
+  - `list-games`: lists all matches in chronological order.
 
 ---
 
-## 📦 Installazione
+## 📦 Installation
 
-Clona il repository e compila con Cargo:
+Clone the repository and build with Cargo:
 
 ```bash
-git clone https://github.com/<tuo-username>/score-cli.git
+git clone https://github.com/<your-username>/score-cli.git
 cd score-cli
 cargo build --release
 ```
 
-Il binario compilato sarà disponibile in `target/release/score-cli`.
+The compiled binary will be available in `target/release/score-cli`.
 
-Puoi anche installarlo localmente con:
+You can also install it locally with:
 
 ```bash
 cargo install --path .
@@ -40,15 +40,15 @@ cargo install --path .
 
 ---
 
-## 🚀 Utilizzo
+## 🚀 Usage
 
-### Aggiungere un giocatore
+### Add a player
 
 ```bash
 score-cli add-player <player-name> [--save-dir <path>]
 ```
 
-Esempio:
+Example:
 
 ```bash
 score-cli add-player giovi98 --save-dir ./data
@@ -56,7 +56,7 @@ score-cli add-player giovi98 --save-dir ./data
 
 ---
 
-### Rimuovere un giocatore
+### Remove a player
 
 ```bash
 score-cli delete-player <player-name> [--save-dir <path>]
@@ -64,13 +64,13 @@ score-cli delete-player <player-name> [--save-dir <path>]
 
 ---
 
-### Aggiungere una partita
+### Add a match
 
 ```bash
 score-cli add-score <game-name> <player1>::<score1> <player2>::<score2> ... [--time <YYYY-MM-DD>] [--save-dir <path>]
 ```
 
-Esempio:
+Example:
 
 ```bash
 score-cli add-score catan giovi98::100 emma00::2 --time 2025-08-07 --save-dir ./data
@@ -78,7 +78,7 @@ score-cli add-score catan giovi98::100 emma00::2 --time 2025-08-07 --save-dir ./
 
 ---
 
-### Rimuovere una partita
+### Remove a match
 
 ```bash
 score-cli delete-score <game-id> [--save-dir <path>]
@@ -86,13 +86,13 @@ score-cli delete-score <game-id> [--save-dir <path>]
 
 ---
 
-### Elencare le partite
+### List matches
 
 ```bash
 score-cli list-games [--save-dir <path>]
 ```
 
-Esempio:
+Example:
 
 ```bash
 score-cli list-games --save-dir ./data
@@ -100,10 +100,10 @@ score-cli list-games --save-dir ./data
 
 ---
 
-## 📂 Formato dei dati
+## 📂 Data format
 
-I dati vengono salvati in formato **JSON** all’interno della directory specificata (o nella cartella di lavoro corrente se non specificata).  
-Esempio di file di partite:
+Data is stored in **JSON** format inside the specified directory (or in the current working directory if none is specified).  
+Example of a match file:
 
 ```json
 {
@@ -123,26 +123,26 @@ Esempio di file di partite:
 
 ---
 
-## 🧪 Test
+## 🧪 Tests
 
-Il progetto include test automatici.  
-Puoi eseguirli con:
+The project includes automated tests.  
+You can run them with:
 
 ```bash
 cargo test
 ```
 
-Sono presenti anche test end-to-end con [`assert_cmd`](https://docs.rs/assert_cmd) per verificare il comportamento del CLI.
+It also includes end-to-end tests using [`assert_cmd`](https://docs.rs/assert_cmd) to verify the CLI behavior.
 
 ---
 
-## ⚙️ Pipeline CI
+## ⚙️ CI Pipeline
 
-Questo progetto utilizza **GitHub Actions** per eseguire automaticamente build e test a ogni push o pull request su `main` e `develop`.
+This project uses **GitHub Actions** to automatically run build and tests on every push or pull request to `main` and `develop`.
 
 ---
 
-## 📜 Licenza
+## 📜 License
 
-Questo progetto è distribuito sotto licenza MIT.  
-Vedi il file [LICENSE](LICENSE) per maggiori dettagli.
+This project is distributed under the MIT license.  
+See the [LICENSE](LICENSE) file for more details.
