@@ -1,7 +1,7 @@
-use serde::{Serialize, Deserialize};
-use tabled::Tabled;
-use std::collections::HashMap;
 use chrono::prelude::*;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use tabled::Tabled;
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -9,7 +9,7 @@ pub struct Game {
     id: Uuid,
     game_name: String,
     scores: HashMap<String, usize>,
-    time: NaiveDate
+    time: NaiveDate,
 }
 
 #[derive(Tabled)]
@@ -22,8 +22,8 @@ pub struct GameRow {
 
 impl From<&Game> for GameRow {
     fn from(game: &Game) -> Self {
-
-        let game_scores = game.get_scores()
+        let game_scores = game
+            .get_scores()
             .iter()
             .map(|(player, score)| format!("{} {}", player, score))
             .collect::<Vec<_>>()
@@ -33,19 +33,22 @@ impl From<&Game> for GameRow {
             id: game.get_id().to_string(),
             name: game.get_name().to_string(),
             date: game.get_datetime().to_string(),
-            scores: game_scores
+            scores: game_scores,
         }
     }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Games {
-    games: HashMap<Uuid, Game>
+    games: HashMap<Uuid, Game>,
 }
 
 impl Game {
-    pub fn build(gamename: String, scores: Vec<String>, time: Option<&str>) -> Result<Game, String> {
-
+    pub fn build(
+        gamename: String,
+        scores: Vec<String>,
+        time: Option<&str>,
+    ) -> Result<Game, String> {
         let parsed_scores = Self::parse_scores(&scores)?;
 
         if parsed_scores.len() == 0 {
@@ -54,12 +57,16 @@ impl Game {
 
         let time = match time {
             Some(time) => NaiveDate::parse_from_str(&time, "%Y-%m-%d")
-                                            .map_err(|_| "Error parsing date. The input format is YYYY-MM-DD.".to_string())?,
-            None => Utc::now().date_naive()
+                .map_err(|_| "Error parsing date. The input format is YYYY-MM-DD.".to_string())?,
+            None => Utc::now().date_naive(),
         };
 
-        Ok(Game {id: Uuid::new_v4(), game_name: gamename, scores: parsed_scores, time: time})
-
+        Ok(Game {
+            id: Uuid::new_v4(),
+            game_name: gamename,
+            scores: parsed_scores,
+            time: time,
+        })
     }
 
     fn parse_scores(scores: &[String]) -> Result<HashMap<String, usize>, String> {
@@ -70,7 +77,9 @@ impl Game {
                 return Err("Error parsing scores. The input format is player::score.".to_string());
             }
             let player = vec_score[0].to_string();
-            let score: usize = vec_score[1].parse().map_err(|_| "Error parsing scores. The input format is player::score.".to_string())?;
+            let score: usize = vec_score[1].parse().map_err(|_| {
+                "Error parsing scores. The input format is player::score.".to_string()
+            })?;
             hashed_scores.insert(player, score);
         }
 
@@ -96,11 +105,13 @@ impl Game {
 
 impl Games {
     pub fn from_games(games: HashMap<Uuid, Game>) -> Self {
-        Self{ games: games }
+        Self { games: games }
     }
 
     pub fn create_empy() -> Self {
-        Self {games: HashMap::new()}
+        Self {
+            games: HashMap::new(),
+        }
     }
 
     pub fn get_games(&self) -> &HashMap<Uuid, Game> {
@@ -108,7 +119,12 @@ impl Games {
     }
 
     pub fn extend(&mut self, games: &Games) {
-        self.games.extend(games.get_games().iter().map(|(id, game)| (id.clone(), game.clone())))
+        self.games.extend(
+            games
+                .get_games()
+                .iter()
+                .map(|(id, game)| (id.clone(), game.clone())),
+        )
     }
 
     pub fn add_game(&mut self, game: Game) {
@@ -124,11 +140,14 @@ impl Games {
     }
 
     pub fn order_by_date(&self) -> Vec<Game> {
-        let mut games = self.games.iter().map(|(_id, game)| game.clone()).collect::<Vec<_>>();
+        let mut games = self
+            .games
+            .iter()
+            .map(|(_id, game)| game.clone())
+            .collect::<Vec<_>>();
         games.sort_by_key(|g| g.time);
         games
     }
-
 }
 
 pub fn from_vec_to_game_rows(games: Vec<Game>) -> Vec<GameRow> {
@@ -141,20 +160,34 @@ mod tests {
 
     #[test]
     fn build_game_error_parsing_time_string() {
-        let game = Game::build("game-name".to_string(), vec!["player1::10".to_string(), "player2::20".to_string()], Some("impossible-to-parse"));
+        let game = Game::build(
+            "game-name".to_string(),
+            vec!["player1::10".to_string(), "player2::20".to_string()],
+            Some("impossible-to-parse"),
+        );
         assert!(game.is_err());
-        assert_eq!(game.unwrap_err(), "Error parsing date. The input format is YYYY-MM-DD.");
+        assert_eq!(
+            game.unwrap_err(),
+            "Error parsing date. The input format is YYYY-MM-DD."
+        );
     }
 
     #[test]
     fn build_game_well_formatted_data() {
-        let game = Game::build("game-name".to_string(), vec!["player1::10".to_string(), "player2::20".to_string()], Some("2025-01-01"));
+        let game = Game::build(
+            "game-name".to_string(),
+            vec!["player1::10".to_string(), "player2::20".to_string()],
+            Some("2025-01-01"),
+        );
         assert!(game.is_ok());
         let game = game.unwrap();
         assert_eq!(game.game_name, "game-name");
         assert_eq!(game.scores.get("player1").unwrap(), &10);
         assert_eq!(game.scores.get("player1").unwrap(), &10);
-        assert_eq!(game.time, NaiveDate::parse_from_str("2025-01-01", "%Y-%m-%d").unwrap());
+        assert_eq!(
+            game.time,
+            NaiveDate::parse_from_str("2025-01-01", "%Y-%m-%d").unwrap()
+        );
     }
 
     #[test]
@@ -172,7 +205,10 @@ mod tests {
         let input = vec!["alice:10".to_string()];
         let result = Game::parse_scores(&input);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "Error parsing scores. The input format is player::score.");
+        assert_eq!(
+            result.unwrap_err(),
+            "Error parsing scores. The input format is player::score."
+        );
     }
 
     #[test]
@@ -180,7 +216,10 @@ mod tests {
         let input = vec!["alice::ten".to_string()];
         let result = Game::parse_scores(&input);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "Error parsing scores. The input format is player::score.");
+        assert_eq!(
+            result.unwrap_err(),
+            "Error parsing scores. The input format is player::score."
+        );
     }
 
     #[test]
@@ -196,6 +235,9 @@ mod tests {
         let input = vec!["alice::10::bonus".to_string()];
         let result = Game::parse_scores(&input);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "Error parsing scores. The input format is player::score.");
+        assert_eq!(
+            result.unwrap_err(),
+            "Error parsing scores. The input format is player::score."
+        );
     }
 }

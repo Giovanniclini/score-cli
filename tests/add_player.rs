@@ -1,7 +1,7 @@
 use assert_cmd::Command;
 use predicates::{prelude::PredicateBooleanExt, str::contains};
-use tempfile::tempdir;
 use std::fs;
+use tempfile::tempdir;
 
 #[test]
 fn test_cli_add_player_creates_file_with_player() {
@@ -37,7 +37,6 @@ fn test_cli_add_player_file_already_exists_with_player() {
     let content = fs::read_to_string(player_file_path).unwrap();
     assert!(content.contains("player-name"));
 }
-
 
 #[test]
 fn test_cli_add_player_already_exists() {

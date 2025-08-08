@@ -22,13 +22,19 @@ fn test_list_games_shows_added_game() {
     Command::cargo_bin("score-cli")
         .unwrap()
         .args(&[
-            "add-score", "catan", "player1::10", "player2::20",
-            "--time", "2025-08-07", "--save-dir", temp_path
+            "add-score",
+            "catan",
+            "player1::10",
+            "player2::20",
+            "--time",
+            "2025-08-07",
+            "--save-dir",
+            temp_path,
         ])
         .assert()
         .success()
         .stdout(contains("Added game of catan"));
-    
+
     Command::cargo_bin("score-cli")
         .unwrap()
         .args(&["list-games", "--save-dir", temp_path])

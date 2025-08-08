@@ -1,13 +1,16 @@
-use crate::commands::{add_player::AddPlayer, add_score::AddScore, delete_player::DeletePlayer, delete_score::DeleteScore, list_games::ListGames};
+use crate::commands::{
+    add_player::AddPlayer, add_score::AddScore, delete_player::DeletePlayer,
+    delete_score::DeleteScore, list_games::ListGames,
+};
 use std::collections::HashMap;
 
-mod models;
-mod utils;
 mod add_player;
-mod delete_player;
 mod add_score;
+mod delete_player;
 mod delete_score;
 mod list_games;
+mod models;
+mod utils;
 
 #[derive(Debug)]
 enum CommandType {
@@ -16,7 +19,7 @@ enum CommandType {
     AddScore,
     DeleteScore,
     ListGames,
-    Invalid
+    Invalid,
 }
 
 pub const SAVE_DIR_OPTIONAL_ARGUMENT: &str = "--save-dir";
@@ -25,16 +28,19 @@ pub const TIME_OPTIONAL_ARGUMENT: &str = "--time";
 pub struct Command {
     command: CommandType,
     args: Vec<String>,
-    optional_args: HashMap<String, String>
+    optional_args: HashMap<String, String>,
 }
 
 impl Command {
-
-    fn new(command_type: CommandType, args: Vec<String>, optional_args: HashMap<String, String>) -> Command {
+    fn new(
+        command_type: CommandType,
+        args: Vec<String>,
+        optional_args: HashMap<String, String>,
+    ) -> Command {
         Command {
             command: command_type,
             args: args,
-            optional_args: optional_args
+            optional_args: optional_args,
         }
     }
 
@@ -51,26 +57,24 @@ impl Command {
             CommandType::AddPlayer => {
                 let command = AddPlayer::create(&self.get_args(), &self.get_optional_args())?;
                 command.run()
-            },
+            }
             CommandType::DeletePlayer => {
                 let command = DeletePlayer::create(&self.get_args(), &self.get_optional_args())?;
                 command.run()
-            },
+            }
             CommandType::AddScore => {
                 let command = AddScore::create(&self.get_args(), &self.get_optional_args())?;
                 command.run()
-            },
+            }
             CommandType::DeleteScore => {
                 let command = DeleteScore::create(&self.get_args(), &self.get_optional_args())?;
                 command.run()
-            },
+            }
             CommandType::ListGames => {
                 let command = ListGames::create(&self.get_args(), &self.get_optional_args())?;
                 command.run()
-            },
-            CommandType::Invalid => {
-                Err("Invalid or missing command.".to_string())
             }
+            CommandType::Invalid => Err("Invalid or missing command.".to_string()),
         }
     }
 
@@ -81,18 +85,16 @@ impl Command {
             Some("add-score") => CommandType::AddScore,
             Some("delete-score") => CommandType::DeleteScore,
             Some("list-games") => CommandType::ListGames,
-            _ => CommandType::Invalid
+            _ => CommandType::Invalid,
         };
 
         let (args, opt_args) = parse_args(&args[1..])?;
 
         Ok(Command::new(command_type, args, opt_args))
-
     }
 }
 
 fn parse_args(args: &[String]) -> Result<(Vec<String>, HashMap<String, String>), String> {
-
     let positional_args = get_positional_args(args);
     let optional_start = positional_args.len();
     let optional_args = get_optional_args(&args[optional_start..])?;
@@ -104,12 +106,11 @@ fn get_positional_args(args: &[String]) -> Vec<String> {
     let mut positional_args = Vec::new();
     let mut i = 0;
     while i < args.len() {
-
         if args[i].as_str().starts_with("--") {
             break;
         } else {
             positional_args.push(args[i].clone());
-            i+=1;
+            i += 1;
         }
     }
 
@@ -121,19 +122,18 @@ fn get_optional_args(args: &[String]) -> Result<HashMap<String, String>, String>
 
     let mut i = 0;
     while i < args.len() {
-
         if [TIME_OPTIONAL_ARGUMENT, SAVE_DIR_OPTIONAL_ARGUMENT].contains(&args[i].as_str()) {
             if i + 1 < args.len() {
-                if args[i+1].as_str().starts_with("--") {
-                    return Err(format!("Missing value for optional argument {}", args[i]))
+                if args[i + 1].as_str().starts_with("--") {
+                    return Err(format!("Missing value for optional argument {}", args[i]));
                 }
                 optional_args.insert(args[i].clone(), args[i + 1].clone());
                 i += 2;
             } else {
-                return Err(format!("Missing value for optional argument {}", args[i]))
+                return Err(format!("Missing value for optional argument {}", args[i]));
             }
         } else {
-            return Err(format!("Unknown optional argument {}", args[i]))
+            return Err(format!("Unknown optional argument {}", args[i]));
         }
     }
 
@@ -267,10 +267,7 @@ mod tests {
 
     #[test]
     fn get_positional_args_no_optional_args() {
-        let args = vec![
-            "player-name1".to_string(),
-            "player-name2".to_string()
-        ];
+        let args = vec!["player-name1".to_string(), "player-name2".to_string()];
         let positional_args = get_positional_args(&args);
         assert_eq!(positional_args, vec!["player-name1", "player-name2"]);
     }
@@ -279,52 +276,52 @@ mod tests {
     fn get_optional_args_unknown_optional_argument() {
         let args = vec!["--unknown-argument".to_string()];
         let optional_args_result = get_optional_args(&args);
-    
+
         assert!(optional_args_result.is_err());
 
         let err_msg = optional_args_result.unwrap_err();
 
         assert_eq!(err_msg, "Unknown optional argument --unknown-argument");
-    
-    }  
+    }
 
     #[test]
     fn get_optional_args_missing_value_for_optional_arguments() {
         let args = vec!["--save-dir".to_string()];
         let optional_args_result = get_optional_args(&args);
-    
+
         assert!(optional_args_result.is_err());
 
         let err_msg = optional_args_result.unwrap_err();
 
         assert_eq!(err_msg, "Missing value for optional argument --save-dir");
-    
-    }  
+    }
 
     #[test]
     fn get_optional_args_consecutive_optional_commands() {
-        let args = vec!["--save-dir".to_string(), "--another-optional-command".to_string()];
+        let args = vec![
+            "--save-dir".to_string(),
+            "--another-optional-command".to_string(),
+        ];
         let optional_args_result = get_optional_args(&args);
-    
+
         assert!(optional_args_result.is_err());
 
         let err_msg = optional_args_result.unwrap_err();
 
         assert_eq!(err_msg, "Missing value for optional argument --save-dir");
-    
-    }  
+    }
 
     #[test]
     fn get_optional_args_standard_behaviour() {
         let args = vec!["--save-dir".to_string(), "path/to/dir".to_string()];
         let optional_args_result = get_optional_args(&args);
-    
+
         assert!(optional_args_result.is_ok());
-    
+
         let optional_args = optional_args_result.unwrap();
         let save_dir = optional_args.get("--save-dir");
-    
+
         assert!(save_dir.is_some());
         assert_eq!(save_dir.unwrap(), "path/to/dir");
-    }    
+    }
 }

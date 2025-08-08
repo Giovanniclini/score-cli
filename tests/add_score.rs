@@ -1,7 +1,7 @@
 use assert_cmd::Command;
 use predicates::str::contains;
-use tempfile::tempdir;
 use std::fs;
+use tempfile::tempdir;
 
 #[test]
 fn test_cli_add_score_creates_file_with_scores() {
@@ -19,9 +19,16 @@ fn test_cli_add_score_creates_file_with_scores() {
         .success();
 
     let mut cmd = Command::cargo_bin("score-cli").unwrap();
-    cmd.args(&["add-score", "catan", "player-name1::10", "player-name2::20", "--save-dir", temp_path])
-        .assert()
-        .success();
+    cmd.args(&[
+        "add-score",
+        "catan",
+        "player-name1::10",
+        "player-name2::20",
+        "--save-dir",
+        temp_path,
+    ])
+    .assert()
+    .success();
 
     let score_file_path = temp.path().join("games").join("catan.json");
     let content = fs::read_to_string(score_file_path).unwrap();
@@ -45,9 +52,18 @@ fn test_cli_add_score_creates_file_with_scores_and_time() {
         .success();
 
     let mut cmd = Command::cargo_bin("score-cli").unwrap();
-    cmd.args(&["add-score", "catan", "player-name1::10", "player-name2::20", "--time", "2025-01-01", "--save-dir", temp_path])
-        .assert()
-        .success();
+    cmd.args(&[
+        "add-score",
+        "catan",
+        "player-name1::10",
+        "player-name2::20",
+        "--time",
+        "2025-01-01",
+        "--save-dir",
+        temp_path,
+    ])
+    .assert()
+    .success();
 
     let score_file_path = temp.path().join("games").join("catan.json");
     let content = fs::read_to_string(score_file_path).unwrap();
@@ -62,10 +78,16 @@ fn test_cli_add_score_no_players_data() {
     let temp_path = temp.path().to_str().unwrap();
 
     let mut cmd = Command::cargo_bin("score-cli").unwrap();
-    cmd.args(&["add-score", "catan", "player-name::10", "--save-dir", temp_path])
-        .assert()
-        .failure()
-        .stderr(contains("No Players' data found."));
+    cmd.args(&[
+        "add-score",
+        "catan",
+        "player-name::10",
+        "--save-dir",
+        temp_path,
+    ])
+    .assert()
+    .failure()
+    .stderr(contains("No Players' data found."));
 }
 
 #[test]
@@ -79,8 +101,17 @@ fn test_cli_add_score_missing_player() {
         .success();
 
     let mut cmd = Command::cargo_bin("score-cli").unwrap();
-    cmd.args(&["add-score", "catan", "player-name1::10", "player-name2::20", "--time", "2025-01-01", "--save-dir", temp_path])
-        .assert()
-        .failure()
-        .stderr(contains("Player player-name1 does not exist."));
+    cmd.args(&[
+        "add-score",
+        "catan",
+        "player-name1::10",
+        "player-name2::20",
+        "--time",
+        "2025-01-01",
+        "--save-dir",
+        temp_path,
+    ])
+    .assert()
+    .failure()
+    .stderr(contains("Player player-name1 does not exist."));
 }
