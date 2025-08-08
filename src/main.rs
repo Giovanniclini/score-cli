@@ -3,10 +3,9 @@ use std::{env, process};
 use score_cli::commands::Command;
 
 fn main() {
-
     let args: Vec<String> = env::args().skip(1).collect();
 
-    let command =  match Command::parse(&args) {
+    let command = match Command::parse(&args) {
         Ok(command) => command,
         Err(err) => {
             eprintln!("Probblem parsing command: {err}");
@@ -18,5 +17,4 @@ fn main() {
         eprintln!("Problem executing command: {err}");
         process::exit(1);
     }
-
 }

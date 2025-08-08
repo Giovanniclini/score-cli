@@ -1,27 +1,32 @@
-use tabled::Table;
-use crate::commands::{SAVE_DIR_OPTIONAL_ARGUMENT, add_score::GAMES_FOLER};
 use crate::commands::models::game::{self, Games};
-use crate::commands::utils::{file_wrapper::FileWrapper, file_wrapper::FileWrapperOptions, storage::Storage, utils::create_path};
-use std::{fs, io, collections::HashMap};
+use crate::commands::utils::{
+    file_wrapper::FileWrapper, file_wrapper::FileWrapperOptions, storage::Storage,
+    utils::create_path,
+};
+use crate::commands::{SAVE_DIR_OPTIONAL_ARGUMENT, add_score::GAMES_FOLER};
+use std::{collections::HashMap, fs, io};
+use tabled::Table;
 
 const ADMITTED_OPTIONAL_ARGUMENTS: [&str; 1] = [SAVE_DIR_OPTIONAL_ARGUMENT];
 
 #[derive(Debug)]
 pub struct ListGames {
-    optional_args: HashMap<String, String>
+    optional_args: HashMap<String, String>,
 }
 
 impl ListGames {
-    pub fn create(_args: &[String], optional_args: &HashMap<String, String>) -> Result<ListGames, String> {
-
+    pub fn create(
+        _args: &[String],
+        optional_args: &HashMap<String, String>,
+    ) -> Result<ListGames, String> {
         for (key, _) in optional_args {
             if !ADMITTED_OPTIONAL_ARGUMENTS.contains(&key.as_str()) {
                 return Err(format!("Unknown optional command for list-games {}.", key));
             }
         }
-        
+
         Ok(ListGames {
-            optional_args: optional_args.to_owned()
+            optional_args: optional_args.to_owned(),
         })
     }
 
@@ -31,9 +36,11 @@ impl ListGames {
         let file_options = FileWrapperOptions::default();
         let game_dir = create_path(&[GAMES_FOLER], data_file_path)?;
 
-        let game_files =  fs::read_dir(&game_dir).map_err(|_| "An error occurred while accessing the data.")?
-                .map(|res| res.map(|e| e.path()))
-                .collect::<Result<Vec<_>, io::Error>>().map_err(|_| "An error occurred whil accessing the data.")?;
+        let game_files = fs::read_dir(&game_dir)
+            .map_err(|_| "An error occurred while accessing the data.")?
+            .map(|res| res.map(|e| e.path()))
+            .collect::<Result<Vec<_>, io::Error>>()
+            .map_err(|_| "An error occurred whil accessing the data.")?;
 
         let mut all_games = Games::create_empy();
         for game_file in game_files {
@@ -49,5 +56,4 @@ impl ListGames {
 
         Ok(())
     }
-
 }

@@ -1,24 +1,23 @@
 use crate::commands::utils::storage::Storage;
 use crate::commands::utils::utils::create_path;
-use std::path::PathBuf;
-use std::fs::{File, OpenOptions, create_dir_all};
-use std::io::{Read, Write, Seek};
 use serde::{Serialize, de::DeserializeOwned};
+use std::fs::{File, OpenOptions, create_dir_all};
+use std::io::{Read, Seek, Write};
+use std::path::PathBuf;
 
 pub struct FileWrapper {
     path: PathBuf,
-    file: File
+    file: File,
 }
 
 #[derive(Clone)]
 pub struct FileWrapperOptions {
     read: bool,
     write: bool,
-    create: bool
+    create: bool,
 }
 
 impl FileWrapperOptions {
-
     pub fn default() -> Self {
         FileWrapperOptions {
             read: true,
@@ -35,12 +34,16 @@ impl Storage for FileWrapper {
     }
 
     fn save(&mut self, entity: &impl Serialize) -> Result<(), String> {
-
         let data_serialized = serde_json::to_string_pretty(entity).unwrap();
-        self.file.set_len(0).map_err(|e| format!("Truncation error: {}", e))?;
-        self.file.rewind().map_err(|e| format!("Rewind error: {}", e))?;
-        self.file.write_all(data_serialized.as_bytes())
-                 .map_err(|_: std::io::Error| format!("Error writing file: {}", self.path.display()))?;
+        self.file
+            .set_len(0)
+            .map_err(|e| format!("Truncation error: {}", e))?;
+        self.file
+            .rewind()
+            .map_err(|e| format!("Rewind error: {}", e))?;
+        self.file
+            .write_all(data_serialized.as_bytes())
+            .map_err(|_: std::io::Error| format!("Error writing file: {}", self.path.display()))?;
         Ok(())
     }
 
@@ -50,36 +53,47 @@ impl Storage for FileWrapper {
         if file_data.trim().is_empty() {
             return Err(format!("File {} is empty.", self.path.display()));
         }
-    
+
         let data_deserialized: T = match serde_json::from_str(&file_data) {
             Ok(data) => data,
             Err(_) => return Err(format!("Error deserializing file: {}", self.path.display())),
         };
-    
+
         Ok(data_deserialized)
     }
 
     fn get_data(&mut self) -> Result<String, String> {
         let mut existing_data = String::new();
-        self.file.rewind().map_err(|e| format!("rewind error: {}", e))?;
-    
+        self.file
+            .rewind()
+            .map_err(|e| format!("rewind error: {}", e))?;
+
         match self.file.read_to_string(&mut existing_data) {
-            Ok(_) => {
-                Ok(existing_data)
-            },
-            Err(_) => Err(format!("An error occurred reading file: {}", self.path.display()))
+            Ok(_) => Ok(existing_data),
+            Err(_) => Err(format!(
+                "An error occurred reading file: {}",
+                self.path.display()
+            )),
         }
     }
 }
 
 impl FileWrapper {
-    pub fn from_string(path: &[&str], base_dir: Option<&String>, options: FileWrapperOptions) -> Result<FileWrapper, String> {
-
+    pub fn from_string(
+        path: &[&str],
+        base_dir: Option<&String>,
+        options: FileWrapperOptions,
+    ) -> Result<FileWrapper, String> {
         let file_path = create_path(path, base_dir)?;
 
         if let Some(parent_dir) = file_path.parent() {
-            create_dir_all(parent_dir)
-                .map_err(|e| format!("Failed to create directories for path {}: {}", file_path.display(), e))?;
+            create_dir_all(parent_dir).map_err(|e| {
+                format!(
+                    "Failed to create directories for path {}: {}",
+                    file_path.display(),
+                    e
+                )
+            })?;
         }
 
         let players_file = OpenOptions::new()
@@ -89,16 +103,26 @@ impl FileWrapper {
             .open(&file_path);
 
         match players_file {
-            Ok(file) => Ok(FileWrapper{path: file_path, file: file}),
-            Err(_err) => Err(format!("An error occured while trying to open: {}", file_path.display()))
+            Ok(file) => Ok(FileWrapper {
+                path: file_path,
+                file: file,
+            }),
+            Err(_err) => Err(format!(
+                "An error occured while trying to open: {}",
+                file_path.display()
+            )),
         }
     }
 
     pub fn from_path(path: PathBuf, options: FileWrapperOptions) -> Result<FileWrapper, String> {
-
         if let Some(parent_dir) = path.parent() {
-            create_dir_all(parent_dir)
-                .map_err(|e| format!("Failed to create directories for path {}: {}", path.display(), e))?;
+            create_dir_all(parent_dir).map_err(|e| {
+                format!(
+                    "Failed to create directories for path {}: {}",
+                    path.display(),
+                    e
+                )
+            })?;
         }
 
         let players_file = OpenOptions::new()
@@ -108,19 +132,24 @@ impl FileWrapper {
             .open(&path);
 
         match players_file {
-            Ok(file) => Ok(FileWrapper{path: path, file: file}),
-            Err(_err) => Err(format!("An error occured while trying to open: {}", path.display()))
+            Ok(file) => Ok(FileWrapper {
+                path: path,
+                file: file,
+            }),
+            Err(_err) => Err(format!(
+                "An error occured while trying to open: {}",
+                path.display()
+            )),
         }
     }
-
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::tempdir;
-    use serde::{Serialize, Deserialize};
+    use serde::{Deserialize, Serialize};
     use std::io::Seek;
+    use tempfile::tempdir;
 
     #[derive(Serialize, Deserialize, PartialEq, Debug)]
     struct DummyData {
@@ -132,11 +161,8 @@ mod tests {
         let dir = tempdir().unwrap();
         let dir_path = dir.path().to_str().unwrap().to_string();
 
-        FileWrapper::from_string(
-            &[file_name],
-            Some(&dir_path),
-            FileWrapperOptions::default()
-        ).unwrap()
+        FileWrapper::from_string(&[file_name], Some(&dir_path), FileWrapperOptions::default())
+            .unwrap()
     }
 
     #[test]
@@ -185,4 +211,3 @@ mod tests {
         assert!(result.is_err());
     }
 }
-

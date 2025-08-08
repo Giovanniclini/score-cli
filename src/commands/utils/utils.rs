@@ -7,14 +7,16 @@ pub fn create_path(path: &[&str], dir: Option<&String>) -> Result<PathBuf, Strin
     } else {
         match env::current_dir() {
             Ok(p) => p,
-            Err(_) => return Err("An error occurred while accessing the working folder.".to_string()),
+            Err(_) => {
+                return Err("An error occurred while accessing the working folder.".to_string());
+            }
         }
     };
 
     for el in path {
         path_object.push(el);
     }
-    
+
     Ok(path_object)
 }
 
@@ -32,7 +34,9 @@ mod tests {
         let path = result.unwrap();
         assert_eq!(
             path,
-            PathBuf::from("/tmp/test_dir").join("subfolder").join("file.json")
+            PathBuf::from("/tmp/test_dir")
+                .join("subfolder")
+                .join("file.json")
         );
     }
 
